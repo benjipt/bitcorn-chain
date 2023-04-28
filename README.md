@@ -1,24 +1,9 @@
-# README
+# Bitcorn Chain
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A backend service in-progress for [Bitcorn-app](https://github.com/benjipt/bitcorn-app).
 
-Things you may want to cover:
+## Technologies
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* Ruby 3.1.0
+* Rails 7.0.4.3
+* Postgres 15.2
