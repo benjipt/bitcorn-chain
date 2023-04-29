@@ -6,10 +6,10 @@ class AddressesController < ApplicationController
     transactions = Transaction.where(from_address: address.address).or(Transaction.where(to_address: address.address))
 
     response_data = {
-      balance: address.cornlet_balance / 1_000_000,
+      balance: address.cornlet_balance.to_f / 1_000_000.0,
       transactions: transactions.map do |transaction|
         {
-          amount: transaction.cornlet_amount.to_f / 1_000_000,
+          amount: transaction.cornlet_amount.to_f / 1_000_000.0,
           timestamp: transaction.created_at,
           toAddress: transaction.to_address.address,
         }
