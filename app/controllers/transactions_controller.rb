@@ -2,7 +2,7 @@ class TransactionsController < ApplicationController
   def create
     transaction_payload = params.require(:transaction).permit(:from_address, :to_address, :amount)
     from_address = Address.find_by(address: transaction_payload[:from_address])
-    to_address = transaction_payload[:to_address].present? ? Address.find_or_create_by(address: transaction_payload[:to_address]) : nil
+    to_address = transaction_payload[:to_address].present? ? Address.find_or_create_by(address: transaction_payload[:to_address].downcase) : nil
 
     if transaction_payload[:amount].nil?
       render json: { error: "Amount is required" }, status: :unprocessable_entity

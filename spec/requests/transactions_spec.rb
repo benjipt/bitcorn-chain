@@ -39,6 +39,24 @@ RSpec.describe 'Transactions', type: :request do
         post transactions_path, params: valid_params, as: :json
         expect(Transaction.last.cornlet_amount).to eq(4_000_000)
       end
+
+      it 'saves the new to_address in lowercase to addresses table' do
+        uppercase_to_address_params = {
+          transaction: {
+            fromAddress: 'from_address',
+            toAddress: 'NEW_ADDRESS',
+            amount: '1'
+          }
+        }
+    
+        expect {
+          post transactions_path, params: uppercase_to_address_params, as: :json
+        }.to change(Address, :count).by(1)
+    
+        created_address = Address.find_by(address: 'new_address')
+        expect(created_address).not_to be_nil
+        expect(created_address.address).to eq('new_address')
+      end
     end
 
     context 'with insufficient balance' do
