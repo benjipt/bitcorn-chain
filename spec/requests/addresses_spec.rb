@@ -37,5 +37,22 @@ RSpec.describe 'Addresses', type: :request do
         expect(response.body).to match("Address not found")
       end
     end
+
+    context 'when the address is in mixed case' do
+      before { get "/addresses/#{address.address.upcase}" }
+
+      it 'converts the address to lower case and returns the correct data' do
+        json = JSON.parse(response.body)
+        expect(json).not_to be_empty
+        expect(json['balance']).to eq(10.0)
+        expect(json['transactions'].size).to eq(1)
+        expect(json['transactions'][0]['amount']).to eq(5.0)
+        expect(json['transactions'][0]['toAddress']).to eq('test_address_2')
+      end
+
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+    end
   end
 end

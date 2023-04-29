@@ -2,7 +2,7 @@ class AddressesController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
   def show
-    address = Address.find_by!(address: params[:id])
+    address = Address.find_by!(address: params[:id].downcase)
     transactions = Transaction.where(from_address: address.address).or(Transaction.where(to_address: address.address))
 
     response_data = {
