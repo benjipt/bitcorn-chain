@@ -55,4 +55,47 @@ RSpec.describe 'Addresses', type: :request do
       end
     end
   end
+
+  describe 'POST /addresses' do
+    context 'when the address does not exist' do
+      before { post '/addresses', params: { id: 'new_address' } }
+  
+      it 'creates a new address and returns status code 201' do
+        expect(response).to have_http_status(201)
+        expect(Address.find_by(address: 'new_address')).not_to be_nil
+      end
+    end
+  
+    context 'when the address already exists' do
+      before { post '/addresses', params: { id: address.address } }
+  
+      it 'returns an error message and status code 422' do
+        expect(response).to have_http_status(422)
+        expect(response.body).to match("User: #{address.address} already exists, please sign in instead")
+      end
+    end
+  
+    context 'when the id parameter is blank' do
+      before { post '/addresses', params: { id: '' } }
+  
+      it 'returns an error message and status code 422' do
+        expect(response).to have_http_status(422)
+        expect(response.body).to match('Invalid address')
+      end
+    end
+
+    let!(:satoshi_address) { create(:address, address: 'satoshi kozuka', cornlet_balance: 1_000_000_000) }
+  
+    context 'when the seed address is not found' do
+      before do
+        Address.find_by(address: 'satoshi kozuka').destroy
+        post '/addresses', params: { id: 'new_address_without_seed' }
+      end
+  
+      it 'returns an error message and status code 422' do
+        expect(response).to have_http_status(422)
+        expect(response.body).to match('Could not find seed address. Unable to create a new user at this time.')
+      end
+    end
+  end
 end
