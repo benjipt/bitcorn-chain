@@ -29,4 +29,4 @@
 /config/master.key
 
 # Ignore environemnt variables
-/env/*
+.env
