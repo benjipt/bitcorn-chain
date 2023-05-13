@@ -23,10 +23,10 @@ class AddressesController < ApplicationController
   end
 
   def create
-    return render json: { error: 'Invalid address' }, status: :unprocessable_entity if params[:id].blank?
+    return render json: { error: 'Invalid address' }, status: :unprocessable_entity if params[:address].blank?
   
     Address.transaction do
-      new_address = Address.find_or_initialize_by(address: params[:id].downcase)
+      new_address = Address.find_or_initialize_by(address: params[:address].downcase)
   
       satoshi_address = Address.find_by(address: 'satoshi kozuka')
       if satoshi_address.nil?
@@ -48,12 +48,24 @@ class AddressesController < ApplicationController
         new_address.cornlet_balance = new_address.cornlet_balance + transaction.cornlet_amount
   
         if new_address.save && transaction.save && satoshi_address.save 
-          render json: { status: 'success', message: "New address: #{new_address.address} created successfully" }, status: :created
+          transactions = Transaction.where(from_address: new_address.address).or(Transaction.where(to_address: new_address.address))
+          
+          response_data = {
+            balance: new_address.cornlet_balance.to_f / 1_000_000.0,
+            transactions: transactions.map do |transaction|
+              {
+                amount: transaction.cornlet_amount.to_f / 1_000_000.0,
+                timestamp: transaction.created_at,
+                toAddress: transaction.to_address.address,
+              }
+            end
+          }
+          render json: response_data, status: :created
         else
           raise ActiveRecord::Rollback, "Failed to create transaction"
         end
       else
-        render json: { error: "User: #{new_address.address} already exists, please sign in instead" }, status: :unprocessable_entity
+        render json: { error: "User: #{new_address.address} already exists, please sign in instead" }, status: :conflict
       end
     end
   
