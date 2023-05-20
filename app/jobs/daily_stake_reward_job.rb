@@ -2,7 +2,7 @@ class DailyStakeRewardJob < ApplicationJob
   queue_as :default
 
   def perform
-    satoshi = Address.find_by_address('satoshi kozuka')
+    satoshi = Address.find_by(address: 'satoshi kozuka')
     unless satoshi && satoshi.cornlet_balance >= 25_000_000
       Rails.logger.info "Satoshi Kozuka's address does not exist or doesn't have enough balance."
       return
