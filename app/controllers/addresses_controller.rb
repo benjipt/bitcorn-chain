@@ -25,16 +25,16 @@ class AddressesController < ApplicationController
 
   def create
     return render json: { error: 'Invalid address' }, status: :unprocessable_entity if params[:address].blank?
-  
+
     Address.transaction do
       new_address = Address.find_or_initialize_by(address: params[:address].downcase)
-  
+
       satoshi_address = Address.find_by(address: 'satoshi kozuka')
       if satoshi_address.nil?
         render json: { error: 'Could not find seed address. Unable to create a new user at this time.' }, status: :unprocessable_entity
         return
       end
-      
+
       if new_address.new_record? # Check if the record is new
 
         # Create a transaction from satoshi to the new address to seed the new address with 100 bitcorns
@@ -43,14 +43,14 @@ class AddressesController < ApplicationController
           to_address: new_address,
           cornlet_amount: 100 * 1_000_000 # Convert to cornlet
         )
-        
+
         # Update balances of seed address and new address
         satoshi_address.cornlet_balance = satoshi_address.cornlet_balance - transaction.cornlet_amount
         new_address.cornlet_balance = new_address.cornlet_balance + transaction.cornlet_amount
-  
-        if new_address.save && transaction.save && satoshi_address.save 
+
+        if new_address.save && transaction.save && satoshi_address.save
           transactions = Transaction.where(from_address: new_address.address).or(Transaction.where(to_address: new_address.address))
-          
+
           response_data = {
             balance: new_address.cornlet_balance.to_f / 1_000_000.0,
             transactions: transactions.map do |transaction|
@@ -69,12 +69,11 @@ class AddressesController < ApplicationController
         render json: { error: "User: #{new_address.address} already exists, please sign in instead" }, status: :conflict
       end
     end
-  
   rescue ActiveRecord::Rollback
     # If the transaction is rolled back, destroy the new_address record if it was persisted
     new_address.destroy if new_address.persisted?
     render json: { error: 'Failed to create transaction' }, status: :unprocessable_entity
-  end  
+  end
 
   private
 

@@ -9,7 +9,7 @@ class CreateBitcornSchema < ActiveRecord::Migration[7.0]
         updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
         CONSTRAINT valid_balance CHECK (cornlet_balance >= 0)
       );
-  
+
       -- Create the transactions table
       CREATE TABLE transactions (
           id SERIAL PRIMARY KEY NOT NULL UNIQUE,
