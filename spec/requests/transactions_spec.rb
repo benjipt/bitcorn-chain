@@ -191,6 +191,5 @@ RSpec.describe 'Transactions', type: :request do
         expect(JSON.parse(response.body)).to eq('error' => 'Amount should be greater than 0')
       end
     end
-
   end
 end
