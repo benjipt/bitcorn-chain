@@ -48,11 +48,11 @@ RSpec.describe 'Transactions', type: :request do
             amount: '1'
           }
         }
-    
+
         expect {
           post transactions_path, params: uppercase_to_address_params, as: :json
         }.to change(Address, :count).by(1)
-    
+
         created_address = Address.find_by(address: 'new_address')
         expect(created_address).not_to be_nil
         expect(created_address.address).to eq('new_address')

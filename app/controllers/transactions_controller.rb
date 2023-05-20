@@ -18,7 +18,7 @@ class TransactionsController < ApplicationController
       render json: { error: "toAddress is required" }, status: :unprocessable_entity
       return
     end
-    
+
     # Convert amount to decimal
     amount_decimal = transaction_payload[:amount].to_d
 
@@ -27,13 +27,13 @@ class TransactionsController < ApplicationController
       render json: { error: "Amount should be greater than 0" }, status: :unprocessable_entity
       return
     end
-    
+
     # Check if amount has more than 6 digits to the right of the decimal point
     if amount_decimal.frac.to_s.split('.')[1].size > 6
       render json: { error: "Amount can have no more than 6 digits to the right of the decimal point" }, status: :unprocessable_entity
       return
     end
-    
+
     # Convert unit from bitcorn to cornlet (1 bitcorn == 1_000_000 cornlets)
     amount = (amount_decimal * 1_000_000).to_i
 

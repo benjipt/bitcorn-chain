@@ -24,7 +24,7 @@ RSpec.describe DailyStakeRewardJob, type: :job do
 
       it 'does not process addresses with balance less than 10_000_000' do
         expect { DailyStakeRewardJob.perform_now }.not_to change { address2.reload.cornlet_balance }
-      end      
+      end
     end
 
     context 'when Satoshi does not have enough balance' do

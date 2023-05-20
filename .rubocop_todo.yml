@@ -6,18 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 23
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowInHeredoc.
-Layout/TrailingWhitespace:
-  Exclude:
-    - 'app/controllers/addresses_controller.rb'
-    - 'app/controllers/transactions_controller.rb'
-    - 'db/migrate/20230427010302_create_bitcorn_schema.rb'
-    - 'spec/jobs/daily_stake_reward_job_spec.rb'
-    - 'spec/requests/addresses_spec.rb'
-    - 'spec/requests/transactions_spec.rb'
-
 # Offense count: 6
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: AllowedMethods, AllowedPatterns.
