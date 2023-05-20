@@ -23,7 +23,7 @@ RSpec.describe DailyStakeRewardJob, type: :job do
       end
 
       it 'does not process addresses with balance less than 10_000_000' do
-        expect { DailyStakeRewardJob.perform_now }.not_to change { address2.reload.cornlet_balance }
+        expect { DailyStakeRewardJob.perform_now }.not_to(change { address2.reload.cornlet_balance })
       end
     end
 
@@ -34,14 +34,14 @@ RSpec.describe DailyStakeRewardJob, type: :job do
 
       it 'does not create any transactions' do
         expect { DailyStakeRewardJob.perform_now }
-          .not_to change { Transaction.count }
+          .not_to(change { Transaction.count })
       end
 
       it 'does not update any balances' do
-        expect { DailyStakeRewardJob.perform_now }.not_to change { Transaction.count }
-        expect { DailyStakeRewardJob.perform_now }.not_to change { satoshi.reload.cornlet_balance }
-        expect { DailyStakeRewardJob.perform_now }.not_to change { address1.reload.cornlet_balance }
-        expect { DailyStakeRewardJob.perform_now }.not_to change { address3.reload.cornlet_balance }
+        expect { DailyStakeRewardJob.perform_now }.not_to(change { Transaction.count })
+        expect { DailyStakeRewardJob.perform_now }.not_to(change { satoshi.reload.cornlet_balance })
+        expect { DailyStakeRewardJob.perform_now }.not_to(change { address1.reload.cornlet_balance })
+        expect { DailyStakeRewardJob.perform_now }.not_to(change { address3.reload.cornlet_balance })
       end
     end
   end
