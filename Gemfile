@@ -3,20 +3,20 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "3.1.0"
 
-gem "rails", "~> 7.0.4", ">= 7.0.4.3"
+gem "bootsnap", require: false
 gem "pg", "~> 1.1"
 gem "puma", "~> 5.0"
-gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
-gem "bootsnap", require: false
 gem 'rack-cors', '~> 2.0', '>= 2.0.1'
+gem "rails", "~> 7.0.4", ">= 7.0.4.3"
+gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 gem 'whenever', '~> 1.0'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
-  gem 'rspec-rails', '~> 6.0', '>= 6.0.1'
-  gem 'factory_bot_rails', '~> 6.2'
   gem 'dotenv-rails', '~> 2.8', '>= 2.8.1'
+  gem 'factory_bot_rails', '~> 6.2'
+  gem 'rspec-rails', '~> 6.0', '>= 6.0.1'
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
 end
