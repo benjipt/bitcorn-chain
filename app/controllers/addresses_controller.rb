@@ -11,11 +11,11 @@ class AddressesController < ApplicationController
 
     response_data = {
       balance: address.cornlet_balance.to_f / 1_000_000.0,
-      transactions: transactions.map do |transaction|
+      transactions: transactions.map do |tx|
         {
-          amount: transaction.cornlet_amount.to_f / 1_000_000.0,
-          timestamp: transaction.created_at,
-          toAddress: transaction.to_address.address,
+          amount: tx.cornlet_amount.to_f / 1_000_000.0,
+          timestamp: tx.created_at,
+          toAddress: tx.to_address.address,
         }
       end
     }
@@ -53,11 +53,11 @@ class AddressesController < ApplicationController
 
           response_data = {
             balance: new_address.cornlet_balance.to_f / 1_000_000.0,
-            transactions: transactions.map do |transaction|
+            transactions: transactions.map do |tx|
               {
-                amount: transaction.cornlet_amount.to_f / 1_000_000.0,
-                timestamp: transaction.created_at,
-                toAddress: transaction.to_address.address,
+                amount: tx.cornlet_amount.to_f / 1_000_000.0,
+                timestamp: tx.created_at,
+                toAddress: tx.to_address.address,
               }
             end
           }
