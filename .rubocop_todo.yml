@@ -8,13 +8,6 @@
 
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EmptyLineBetweenMethodDefs, EmptyLineBetweenClassDefs, EmptyLineBetweenModuleDefs, AllowAdjacentOneLineDefs, NumberOfEmptyLines.
-Layout/EmptyLineBetweenDefs:
-  Exclude:
-    - 'app/controllers/addresses_controller.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
 Layout/EmptyLines:
   Exclude:
     - 'config/environments/development.rb'

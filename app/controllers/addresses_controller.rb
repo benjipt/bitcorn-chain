@@ -1,5 +1,6 @@
 # addresses_controller.rb
 class SeedAddressNotFoundError < StandardError; end
+
 class AddressesController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
   rescue_from ActiveRecord::RecordInvalid, with: :record_invalid
