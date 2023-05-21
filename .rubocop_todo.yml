@@ -14,15 +14,10 @@ Metrics/BlockLength:
     - 'context'
     - 'it'
 
-# Offense count: 2
-# Configuration parameters: AllowedMethods, AllowedPatterns.
-Metrics/CyclomaticComplexity:
-  Max: 10
-
 # Offense count: 4
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns.
 Metrics/MethodLength:
-  Max: 39
+  Max: 12
 
 # Offense count: 2
 # Configuration parameters: AllowedMethods, AllowedPatterns.

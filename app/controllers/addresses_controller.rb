@@ -18,20 +18,14 @@ class AddressesController < ApplicationController
     new_address, transaction = initialize_address_with_seed_transaction
 
     if new_address.new_record?
-      Address.transaction do
-        save_address_and_process_transaction(new_address, transaction)
-      rescue ActiveRecord::RecordInvalid
-        handle_transaction_rollback(new_address)
-      end
+      create_new_address(new_address, transaction)
     else
-      render json: { error: "User: #{new_address.address} already exists, please sign in instead" }, status: :conflict
+      render_existing_address_error(new_address)
     end
   rescue ActiveRecord::Rollback
-    # If the transaction is rolled back, destroy the new_address record if it was persisted
-    new_address&.destroy if new_address&.persisted?
-    render json: { error: 'Failed to create transaction' }, status: :unprocessable_entity
+    rollback_transaction(new_address)
   rescue SeedAddressNotFoundError
-    render json: { error: 'Could not find seed address. Unable to create a new user at this time.' }, status: :internal_server_error
+    render_seed_address_not_found
   end
 
   private
@@ -68,6 +62,14 @@ class AddressesController < ApplicationController
     )
   end
 
+  def create_new_address(new_address, transaction)
+    Address.transaction do
+      save_address_and_process_transaction(new_address, transaction)
+    rescue ActiveRecord::RecordInvalid
+      rollback_transaction(new_address)
+    end
+  end
+
   def save_address_and_process_transaction(new_address, transaction)
     # Update balances of seed address and new address
     transaction.from_address.cornlet_balance -= transaction.cornlet_amount
@@ -82,11 +84,20 @@ class AddressesController < ApplicationController
     end
   end
 
+  def render_existing_address_error(new_address)
+    render json: { error: "User: #{new_address.address} already exists, please sign in instead" }, status: :conflict
+  end
+
+  def record_invalid(exception)
+    render json: { error: "Invalid address: #{exception.message}" }, status: :unprocessable_entity
+  end
+
   def render_invalid_address
     render json: { error: 'Invalid address' }, status: :unprocessable_entity
   end
 
-  def handle_transaction_rollback(new_address)
+  def rollback_transaction(new_address)
+    # If the transaction is rolled back, destroy the new_address record if it was persisted
     new_address&.destroy if new_address&.persisted?
     render json: { error: 'Failed to create transaction' }, status: :unprocessable_entity
   end
@@ -95,7 +106,7 @@ class AddressesController < ApplicationController
     render json: { error: 'Address not found' }, status: :not_found
   end
 
-  def record_invalid(exception)
-    render json: { error: "Invalid address: #{exception.message}" }, status: :unprocessable_entity
+  def render_seed_address_not_found
+    render json: { error: 'Could not find seed address. Unable to create a new user at this time.' }, status: :internal_server_error
   end
 end
