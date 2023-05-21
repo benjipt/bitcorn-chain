@@ -1,55 +1,89 @@
 class TransactionsController < ApplicationController
+  before_action :load_params, only: :create
+
   def create
-    transaction_payload = params.require(:transaction).permit(:from_address, :to_address, :amount)
-    from_address = Address.find_by(address: transaction_payload[:from_address].downcase) if transaction_payload[:from_address].present?
-    to_address = transaction_payload[:to_address].present? ? Address.find_or_create_by(address: transaction_payload[:to_address].downcase) : nil
+    return unless valid_transaction?
 
-    if transaction_payload[:amount].nil?
-      render json: { error: "Amount is required" }, status: :unprocessable_entity
-      return
-    end
+    create_transaction
+  end
 
-    if from_address.nil?
-      render json: { error: "fromAddress is required" }, status: :unprocessable_entity
-      return
-    end
+  private
 
-    if to_address.nil?
-      render json: { error: "toAddress is required" }, status: :unprocessable_entity
-      return
-    end
+  def load_params
+    @transaction_payload = params.require(:transaction).permit(:from_address, :to_address, :amount)
+    @from_address = find_address(@transaction_payload[:from_address])
+    @to_address = find_or_create_address(@transaction_payload[:to_address])
+    # 1_000_000 is used to convert the amount to the smallest unit of Bitcorn (1 Bitcorn = 1_000_000 Cornlets)
+    @amount = (@transaction_payload[:amount].to_d * 1_000_000).to_i if @transaction_payload[:amount]
+  end
 
-    # Convert amount to decimal
-    amount_decimal = transaction_payload[:amount].to_d
+  def find_address(address)
+    Address.find_by(address: address.downcase) if address.present?
+  end
 
-    # Check if amount is valid
-    if amount_decimal <= 0
-      render json: { error: "Amount should be greater than 0" }, status: :unprocessable_entity
-      return
-    end
+  def find_or_create_address(address)
+    address.present? ? Address.find_or_create_by(address: address.downcase) : nil
+  end
 
-    # Check if amount has more than 6 digits to the right of the decimal point
-    if amount_decimal.frac.to_s.split('.')[1].size > 6
-      render json: { error: "Amount can have no more than 6 digits to the right of the decimal point" }, status: :unprocessable_entity
-      return
-    end
+  def valid_transaction?
+    check_required_fields && check_amount && check_balance
+  end
 
-    # Convert unit from bitcorn to cornlet (1 bitcorn == 1_000_000 cornlets)
-    amount = (amount_decimal * 1_000_000).to_i
+  def check_required_fields
+    errors = {
+      amount_required: 'Amount is required',
+      from_address_required: 'fromAddress is required',
+      to_address_required: 'toAddress is required'
+    }
+    return error_response(errors[:amount_required]) if @amount.nil?
+    return error_response(errors[:from_address_required]) if @from_address.nil?
+    return error_response(errors[:to_address_required]) if @to_address.nil?
 
-    if from_address.cornlet_balance < amount
-      render json: { error: "insufficient balance" }, status: :unprocessable_entity
-      return
-    end
+    true
+  end
 
-    transaction = Transaction.new(from_address: from_address, to_address: to_address, cornlet_amount: amount)
+  def check_amount
+    errors = {
+      invalid_amount: 'Amount should be greater than 0',
+      invalid_decimal_digits: 'Amount can have no more than 6 digits to the right of the decimal point'
+    }
+    return error_response(errors[:invalid_amount]) if @amount <= 0
+    return error_response(errors[:invalid_decimal_digits]) if decimal_size(@transaction_payload[:amount].to_d) > 6
+
+    true
+  end
+
+  def check_balance
+    error = 'insufficient balance'
+    return error_response(error) if @from_address.cornlet_balance < @amount
+
+    true
+  end
+
+  def create_transaction
+    transaction = Transaction.new(from_address: @from_address, to_address: @to_address, cornlet_amount: @amount)
 
     if transaction.save
-      from_address.update(cornlet_balance: from_address.cornlet_balance - amount)
-      to_address.update(cornlet_balance: to_address.cornlet_balance + amount)
+      @from_address.update(cornlet_balance: @from_address.cornlet_balance - @amount)
+      @to_address.update(cornlet_balance: @to_address.cornlet_balance + @amount)
       render json: { status: "success", message: "Transaction created successfully" }, status: :created
     else
-      render json: { error: "Unable to create transaction" }, status: :unprocessable_entity
+      error_response("Unable to create transaction")
     end
+  end
+
+  # Because Bitcorn is divisible to 6 decimal places.
+  # Determines the size of the decimal portion of a number.
+  # @param decimal [Decimal] The decimal number to check.
+  # @return [Integer] The size of the decimal portion.
+  def decimal_size(decimal)
+    # convert the fractional part of the decimal to a string,
+    # split at the decimal point, and return the size of the fraction part
+    decimal.frac.to_s.split('.')[1].size
+  end
+
+  def error_response(message)
+    render json: { error: message }, status: :unprocessable_entity
+    false
   end
 end
