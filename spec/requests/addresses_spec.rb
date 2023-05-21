@@ -13,7 +13,7 @@ RSpec.describe 'Addresses', type: :request do
       before { get "/addresses/#{address.address}" }
 
       it 'returns the address balance and transactions' do
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json).not_to be_empty
         expect(json['balance']).to eq(10.0)
         expect(json['transactions'].size).to eq(1)
@@ -42,7 +42,7 @@ RSpec.describe 'Addresses', type: :request do
       before { get "/addresses/#{address.address.upcase}" }
 
       it 'converts the address to lower case and returns the correct data' do
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json).not_to be_empty
         expect(json['balance']).to eq(10.0)
         expect(json['transactions'].size).to eq(1)
