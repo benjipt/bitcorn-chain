@@ -1,6 +1,39 @@
 # addresses_controller.rb
 class SeedAddressNotFoundError < StandardError; end
 
+# AddressesController is a controller class that manages the endpoints related
+# to the Address model. It provides functionality for showing and creating addresses.
+# It handles exceptions related to ActiveRecord and also responds with appropriate
+# HTTP status codes and JSON responses for each action.
+#
+# It includes several private helper methods for fetching transactions associated
+# with an address, building response data, initializing an address with a seed transaction,
+# creating a new address, saving address and processing transactions, rendering existing
+# address error, handling record invalid exception, rendering invalid address, rolling back
+# transaction, handling record not found exception and rendering seed address not found error.
+#
+# The `show` action finds the address using the `find_by!` method which will raise an exception
+# if the address is not found. The `create` action creates a new address and a seed transaction
+# associated with it. It handles exceptions such as `ActiveRecord::Rollback` and `SeedAddressNotFoundError`.
+#
+# The create action is responsible for creating a new address and an initial seed transaction.
+# It uses the `find_or_initialize_by` method to find an existing address or initialize a new one.
+# It also uses the `initialize_seed_transaction` method to initialize a seed transaction.
+# It uses the `Address.transaction` method to wrap the creation of an address and a transaction
+# in a transaction block. If the transaction fails to save, it will raise an exception which will
+# be rescued by the `rescue_from ActiveRecord::RecordInvalid` method and the transaction will be rolled back.
+#
+# The show action can return the following responses:
+#
+# - 200 OK: If the address is found.
+# - 404 Not Found: If the address is not found.
+#
+# The create action can return the following responses:
+#
+# - 201 Created: If the address and transaction are successfully created.
+# - 400 Bad Request: If the address is missing from the request body.
+# - 422 Unprocessable Entity: If the address is already registered in the system.
+# - 500 Internal Server Error: If the seed address is not found in the database.
 class AddressesController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
   rescue_from ActiveRecord::RecordInvalid, with: :record_invalid
