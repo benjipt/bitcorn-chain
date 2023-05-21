@@ -25,7 +25,7 @@ class CreateBitcornSchema < ActiveRecord::Migration[7.0]
   end
 
   def down
-    execute <<-SQL
+    execute <<-SQL.squish
       DROP TABLE transactions;
       DROP TABLE addresses;
     SQL
