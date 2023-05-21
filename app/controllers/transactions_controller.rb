@@ -64,8 +64,7 @@ class TransactionsController < ApplicationController
     transaction = Transaction.new(from_address: @from_address, to_address: @to_address, cornlet_amount: @amount)
 
     if transaction.save
-      @from_address.update(cornlet_balance: @from_address.cornlet_balance - @amount)
-      @to_address.update(cornlet_balance: @to_address.cornlet_balance + @amount)
+      update_balances
       render json: { status: "success", message: "Transaction created successfully" }, status: :created
     else
       error_response("Unable to create transaction")
@@ -85,5 +84,10 @@ class TransactionsController < ApplicationController
   def error_response(message)
     render json: { error: message }, status: :unprocessable_entity
     false
+  end
+
+  def update_balances
+    @from_address.update(cornlet_balance: @from_address.cornlet_balance - @amount)
+    @to_address.update(cornlet_balance: @to_address.cornlet_balance + @amount)
   end
 end
