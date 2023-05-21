@@ -26,7 +26,7 @@ RSpec.describe 'Transactions', type: :request do
       it 'returns a success response and a success message' do
         post transactions_path, params: valid_params, as: :json
         expect(response).to have_http_status(:created)
-        expect(JSON.parse(response.body)).to eq('status' => 'success', 'message' => 'Transaction created successfully')
+        expect(response.parsed_body).to eq('status' => 'success', 'message' => 'Transaction created successfully')
       end
 
       it 'updates the from_address and to_address cornlet_balance' do
@@ -79,7 +79,7 @@ RSpec.describe 'Transactions', type: :request do
       it 'returns an unprocessable_entity response with an insufficient balance error message' do
         post transactions_path, params: insufficient_balance_params, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq('error' => 'insufficient balance')
+        expect(response.parsed_body).to eq('error' => 'insufficient balance')
       end
     end
 
@@ -102,7 +102,7 @@ RSpec.describe 'Transactions', type: :request do
       it 'returns an unprocessable_entity response with a missing fromAddress error message' do
         post transactions_path, params: missing_from_address_params, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq('error' => 'fromAddress is required')
+        expect(response.parsed_body).to eq('error' => 'fromAddress is required')
       end
     end
 
@@ -125,7 +125,7 @@ RSpec.describe 'Transactions', type: :request do
       it 'returns an unprocessable_entity response with a missing toAddress error message' do
         post transactions_path, params: missing_to_address_params, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq('error' => 'toAddress is required')
+        expect(response.parsed_body).to eq('error' => 'toAddress is required')
       end
     end
 
@@ -148,7 +148,7 @@ RSpec.describe 'Transactions', type: :request do
       it 'returns an unprocessable_entity response with a missing amount error message' do
         post transactions_path, params: missing_amount_params, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq('error' => 'Amount is required')
+        expect(response.parsed_body).to eq('error' => 'Amount is required')
       end
     end
 
@@ -184,11 +184,11 @@ RSpec.describe 'Transactions', type: :request do
       it 'returns an unprocessable_entity response with an amount less than 0 error message' do
         post transactions_path, params: negative_amount_params, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq('error' => 'Amount should be greater than 0')
+        expect(response.parsed_body).to eq('error' => 'Amount should be greater than 0')
 
         post transactions_path, params: zero_amount_params, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq('error' => 'Amount should be greater than 0')
+        expect(response.parsed_body).to eq('error' => 'Amount should be greater than 0')
       end
     end
   end
