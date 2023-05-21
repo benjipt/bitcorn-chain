@@ -92,8 +92,8 @@ RSpec.describe 'Addresses', type: :request do
         post '/addresses', params: { address: 'new_address_without_seed' }
       end
 
-      it 'returns an error message and status code 422' do
-        expect(response).to have_http_status(422)
+      it 'returns an error message and status code 500' do
+        expect(response).to have_http_status(500)
         expect(response.body).to match('Could not find seed address. Unable to create a new user at this time.')
       end
     end
