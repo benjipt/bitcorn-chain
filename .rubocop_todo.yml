@@ -30,7 +30,6 @@ Rails/HasManyOrHasOneDependent:
 # Configuration parameters: AllowedConstants.
 Style/Documentation:
   Exclude:
-    - 'app/controllers/addresses_controller.rb'
     - 'app/controllers/application_controller.rb'
     - 'app/controllers/transactions_controller.rb'
     - 'app/jobs/daily_stake_reward_job.rb'
