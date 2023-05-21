@@ -18,9 +18,9 @@ RSpec.describe 'Transactions', type: :request do
       end
 
       it 'creates a new transaction' do
-        expect {
+        expect do
           post transactions_path, params: valid_params, as: :json
-        }.to change(Transaction, :count).by(1)
+        end.to change(Transaction, :count).by(1)
       end
 
       it 'returns a success response and a success message' do
@@ -49,9 +49,9 @@ RSpec.describe 'Transactions', type: :request do
           }
         }
 
-        expect {
+        expect do
           post transactions_path, params: uppercase_to_address_params, as: :json
-        }.to change(Address, :count).by(1)
+        end.to change(Address, :count).by(1)
 
         created_address = Address.find_by(address: 'new_address')
         expect(created_address).not_to be_nil
@@ -71,9 +71,9 @@ RSpec.describe 'Transactions', type: :request do
       end
 
       it 'does not create a new transaction' do
-        expect {
+        expect do
           post transactions_path, params: insufficient_balance_params, as: :json
-        }.not_to change(Transaction, :count)
+        end.not_to change(Transaction, :count)
       end
 
       it 'returns an unprocessable_entity response with an insufficient balance error message' do
@@ -94,9 +94,9 @@ RSpec.describe 'Transactions', type: :request do
       end
 
       it 'does not create a new transaction' do
-        expect {
+        expect do
           post transactions_path, params: missing_from_address_params, as: :json
-        }.not_to change(Transaction, :count)
+        end.not_to change(Transaction, :count)
       end
 
       it 'returns an unprocessable_entity response with a missing fromAddress error message' do
@@ -117,9 +117,9 @@ RSpec.describe 'Transactions', type: :request do
       end
 
       it 'does not create a new transaction' do
-        expect {
+        expect do
           post transactions_path, params: missing_to_address_params, as: :json
-        }.not_to change(Transaction, :count)
+        end.not_to change(Transaction, :count)
       end
 
       it 'returns an unprocessable_entity response with a missing toAddress error message' do
@@ -140,9 +140,9 @@ RSpec.describe 'Transactions', type: :request do
       end
 
       it 'does not create a new transaction' do
-        expect {
+        expect do
           post transactions_path, params: missing_amount_params, as: :json
-        }.not_to change(Transaction, :count)
+        end.not_to change(Transaction, :count)
       end
 
       it 'returns an unprocessable_entity response with a missing amount error message' do
@@ -173,12 +173,12 @@ RSpec.describe 'Transactions', type: :request do
       end
 
       it 'does not create a new transaction' do
-        expect {
+        expect do
           post transactions_path, params: negative_amount_params, as: :json
-        }.not_to change(Transaction, :count)
-        expect {
+        end.not_to change(Transaction, :count)
+        expect do
           post transactions_path, params: zero_amount_params, as: :json
-        }.not_to change(Transaction, :count)
+        end.not_to change(Transaction, :count)
       end
 
       it 'returns an unprocessable_entity response with an amount less than 0 error message' do
