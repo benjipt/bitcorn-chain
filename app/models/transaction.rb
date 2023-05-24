@@ -1,38 +1,48 @@
 # frozen_string_literal: true
 
-# models/transaction.rb
+# Transaction
 #
-# The Transaction model represents transactions within the application.
-# Each transaction belongs to both a sender and receiver represented by the 'from_address' and 'to_address' fields respectively.
+# The Transaction class represents a record of transfer of Bitcorns (in its smallest unit, Cornlets)
+# between two addresses in the system. It inherits from ApplicationRecord, thus enjoying the benefits
+# of the Rails model layer including lifecycle callbacks, validation and transaction control, among
+# other features.
 #
-# == Schema Information
+# Relationships:
+# - belongs_to :from_address: This represents the sender's address. The foreign key in the transactions
+# table is 'from_address' and it maps to the 'address' field in the 'addresses' table.
+# - belongs_to :to_address: This represents the receiver's address. The foreign key in the transactions
+# table is 'to_address' and it maps to the 'address' field in the 'addresses' table.
 #
-# Table name: transactions
+# Validations:
+# - cornlet_amount: Ensures that the amount to be transferred is less than or equal to the balance of
+# the sender's address.
 #
-# Columns:
-# * id (integer)
-# * from_address (string)
-# * to_address (string)
-# * cornlet_amount (integer)
-# * created_at (datetime)
-# * updated_at (datetime)
+# Class Methods:
+# - create_and_process: This method handles the transaction creation and processing. It accepts three
+# parameters, the sender's address, receiver's address, and the amount to be transferred. It first attempts
+# to create a new transaction with the provided details. If successful, it deducts the amount from the sender's
+# balance and adds it to the receiver's balance, and returns true. If unsuccessful, it simply returns false.
 #
-# Each Transaction has two associations with the Address model:
-# * from_address: A belongs_to relationship where the foreign key on the Transaction is from_address
-# and the primary key on the Address is address.
-# * to_address: A belongs_to relationship where the foreign key on the Transaction is to_address
-# and the primary key on the Address is address.
-#
-# The inverse_of option is set on each of these associations, allowing Rails to know that the two associations are inverses of each other.
-# This means that if you have the object on one side of the association, you can get the object on the other side without
-# going through the database.
-#
-# The model also includes a validation for the cornlet_amount to ensure it does not exceed the balance of the sender's address.
+# Private Instance Methods:
+# - sender_balance: This method fetches the balance of the sender's address.
 class Transaction < ApplicationRecord
   belongs_to :from_address, class_name: 'Address', foreign_key: 'from_address', primary_key: 'address', inverse_of: :sent_transactions
   belongs_to :to_address, class_name: 'Address', foreign_key: 'to_address', primary_key: 'address', inverse_of: :received_transactions
 
   validates :cornlet_amount, numericality: { less_than_or_equal_to: :sender_balance }
+
+  # Method to create transaction, update balances and save changes to the database
+  def self.create_and_process(from_address, to_address, amount)
+    transaction = Transaction.new(from_address:, to_address:, cornlet_amount: amount)
+
+    if transaction.save
+      from_address.update(cornlet_balance: from_address.cornlet_balance - amount)
+      to_address.update(cornlet_balance: to_address.cornlet_balance + amount)
+      true
+    else
+      false
+    end
+  end
 
   private
 

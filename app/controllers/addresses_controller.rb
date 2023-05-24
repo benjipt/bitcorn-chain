@@ -9,7 +9,7 @@ class SeedAddressNotFoundError < StandardError; end
 # The create action creates a new address and an initial transaction to seed the
 # address with cornlets, then returns the balance and transaction history for the
 # new address.
-# 
+#
 # The show action can return the following responses:
 #
 # - 200 OK: If the address is found.
