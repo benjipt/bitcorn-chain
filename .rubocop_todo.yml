@@ -26,13 +26,6 @@ Rails/HasManyOrHasOneDependent:
   Exclude:
     - 'app/models/address.rb'
 
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowedVars.
-Style/FetchEnvVar:
-  Exclude:
-    - 'config/initializers/cors.rb'
-
 # Offense count: 39
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: EnforcedStyle.
