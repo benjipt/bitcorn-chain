@@ -1,53 +1,78 @@
 # frozen_string_literal: true
 
-# This controller manages transactions within the application.
-# Transactions have the fields 'from_address', 'to_address' and 'amount'.
-# Each transaction transfers an amount from a sender to a receiver, denoted by their respective addresses.
-# The amounts are in the smallest unit of Bitcorn, the Cornlet (1 Bitcorn = 1_000_000 Cornlets).
-# The controller checks for validation before processing a transaction such as required fields, sufficient balance and amount validity.
-
-# The create action can return the following responses:
+# TransactionsController
 #
-# - 201 Created: If the transaction is successfully created.
-# - 422 Unprocessable Entity: If the transaction is invalid.
+# The TransactionsController is responsible for handling HTTP requests related to transactions in the
+# application. A transaction represents a transfer of Bitcorn
+# (represented in its smallest unit, Cornlets) between two addresses. The controller contains actions
+# to create new transactions.
+#
+# Actions:
+# - create: creates a new transaction
+#
+# The create action is as follows:
+# - First, it loads transaction parameters (from_address, to_address, amount) from the HTTP request
+# - Then it checks the validity of the transaction by ensuring all required fields are present, the amount
+# is greater than 0 and not too precise, and the sender has enough balance.
+# - If the transaction is valid, it calls a method in the Transaction model that encapsulates transaction
+# creation and balance updating.
+# - If the transaction is created successfully, it renders a JSON response with a success message and a HTTP
+# status code of 201.
+# - If the transaction is not created successfully, it renders a JSON error message with a HTTP status
+# code of 422.
+#
+# The controller uses several private helper methods to validate transactions and handle errors. These include
+# methods to check the presence of required fields, validate the transaction amount, check the sender's balance,
+# and return an error response if needed.
+#
+# All addresses are normalized to lowercase for consistency.
+#
+# The 'load_params' method is run before the create action. This method loads and validates the parameters of
+# the transaction from the request body.
+#
+# The 'find_address' and 'find_or_create_address' methods return an address from the database based on the given
+# address, if present.
+# 'find_or_create_address' will create a new address if the given address is not found.
+#
+# The 'check_balance' method checks if the sender has a sufficient balance to carry out the transaction.
+#
+# The 'error_response' method is used to render a JSON error message with a status of 422 (unprocessable entity).
+#
+# The 'decimal_size' method returns the size of the decimal portion of a decimal number.
 class TransactionsController < ApplicationController
-  # Loads the transaction parameters before running the create action.
   before_action :load_params, only: :create
 
-  # Creates a new transaction if the transaction is valid.
   def create
     return unless valid_transaction?
 
-    create_transaction
+    if Transaction.create_and_process(@from_address, @to_address, @amount)
+      render json: { status: 'success', message: 'Transaction created successfully' }, status: :created
+    else
+      error_response('Unable to create transaction')
+    end
   end
 
   private
 
-  # Loads and validates the parameters of the transaction from the request body.
   def load_params
     @transaction_payload = params.require(:transaction).permit(:from_address, :to_address, :amount)
     @from_address = find_address(@transaction_payload[:from_address])
     @to_address = find_or_create_address(@transaction_payload[:to_address])
-    # 1_000_000 is used to convert the amount to the smallest unit of Bitcorn (1 Bitcorn = 1_000_000 Cornlets)
     @amount = (@transaction_payload[:amount].to_d * 1_000_000).to_i if @transaction_payload[:amount]
   end
 
-  # Returns an address from the database based on the given address, if present.
   def find_address(address)
     Address.find_by(address: address.downcase) if address.present?
   end
 
-  # Finds or creates an address in the database based on the given address, if present.
   def find_or_create_address(address)
     address.present? ? Address.find_or_create_by(address: address.downcase) : nil
   end
 
-  # Checks if the transaction has all required fields, a valid amount and a sufficient balance.
   def valid_transaction?
     check_required_fields && check_amount && check_balance
   end
 
-  # Checks if the transaction has all the required fields and returns error messages if they are missing.
   def check_required_fields
     errors = {
       amount_required: 'Amount is required',
@@ -61,7 +86,6 @@ class TransactionsController < ApplicationController
     true
   end
 
-  # Checks if the transaction amount is greater than 0 and has no more than 6 digits to the right of the decimal point.
   def check_amount
     errors = {
       invalid_amount: 'Amount should be greater than 0',
@@ -73,7 +97,6 @@ class TransactionsController < ApplicationController
     true
   end
 
-  # Checks if the sender has a sufficient balance to carry out the transaction.
   def check_balance
     error = 'insufficient balance'
     return error_response(error) if @from_address.cornlet_balance < @amount
@@ -81,37 +104,12 @@ class TransactionsController < ApplicationController
     true
   end
 
-  # Creates a new transaction with the loaded parameters and saves it to the database. Updates the balance on successful transaction.
-  def create_transaction
-    transaction = Transaction.new(from_address: @from_address, to_address: @to_address, cornlet_amount: @amount)
-
-    if transaction.save
-      update_balances
-      render json: { status: 'success', message: 'Transaction created successfully' }, status: :created
-    else
-      error_response('Unable to create transaction')
-    end
-  end
-
-  # Because Bitcorn is divisible to 6 decimal places.
-  # Determines the size of the decimal portion of a number.
-  # @param decimal [Decimal] The decimal number to check.
-  # @return [Integer] The size of the decimal portion.
   def decimal_size(decimal)
-    # convert the fractional part of the decimal to a string,
-    # split at the decimal point, and return the size of the fraction part
     decimal.frac.to_s.split('.')[1].size
   end
 
-  # Renders a json error message with a status of 422 (unprocessable entity).
   def error_response(message)
     render json: { error: message }, status: :unprocessable_entity
     false
-  end
-
-  # Updates the balance of the sender and receiver after a successful transaction.
-  def update_balances
-    @from_address.update(cornlet_balance: @from_address.cornlet_balance - @amount)
-    @to_address.update(cornlet_balance: @to_address.cornlet_balance + @amount)
   end
 end
