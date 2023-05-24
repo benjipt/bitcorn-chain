@@ -1,3 +1,20 @@
+# This migration creates the bitcorn schema for the application.
+# It defines two tables: `addresses` and `transactions`.
+#
+# The `addresses` table represents Bitcorn addresses and contains the following columns:
+# * `address`: the unique identifier of the address. It is the primary key of the table.
+# * `cornlet_balance`: the balance of Cornlets for the address. It cannot be less than 0.
+# * `created_at` and `updated_at`: timestamps for record creation and last update.
+#
+# The `transactions` table represents transactions between addresses and contains the following columns:
+# * `id`: the unique identifier of the transaction. It is the primary key of the table.
+# * `from_address` and `to_address`: the sender's and recipient's addresses.
+#   These are foreign keys that reference the `address` column in the `addresses` table.
+# * `cornlet_amount`: the amount of Cornlets being transferred. It must be greater than 0.
+# * `created_at`: timestamp for the transaction's creation.
+#
+# In the `up` method, these tables are created with their columns and constraints.
+# In the `down` method, these tables are dropped, effectively rolling back the migration.
 class CreateBitcornSchema < ActiveRecord::Migration[7.0]
   def up
     execute <<-SQL
