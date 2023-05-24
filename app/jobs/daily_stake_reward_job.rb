@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This is a job class that is responsible for handling daily stake rewards.
 # The stake rewards are transferred from the seed address ('satoshi kozuka') to each
 # address that has a cornlet_balance greater than or equal to 10,000,000 Cornlets.

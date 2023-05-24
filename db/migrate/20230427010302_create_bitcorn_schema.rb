@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This migration creates the bitcorn schema for the application.
 # It defines two tables: `addresses` and `transactions`.
 #

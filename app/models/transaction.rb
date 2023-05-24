@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # models/transaction.rb
 #
 # The Transaction model represents transactions within the application.
