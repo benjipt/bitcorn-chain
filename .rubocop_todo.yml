@@ -30,7 +30,6 @@ Rails/HasManyOrHasOneDependent:
 # Configuration parameters: AllowedConstants.
 Style/Documentation:
   Exclude:
-    - 'config/application.rb'
     - 'db/migrate/20230427010302_create_bitcorn_schema.rb'
 
 # Offense count: 2

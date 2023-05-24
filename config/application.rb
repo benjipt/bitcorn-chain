@@ -19,6 +19,9 @@ require "action_cable/engine"
 Bundler.require(*Rails.groups)
 
 module BitcornChain
+  # The Application class is responsible for loading all configuration for the Rails application.
+  # The configuration is loaded from the files in the config directory.
+  # The Application class also holds the initializers which are used to configure Rails and load components of the Rails framework.
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
