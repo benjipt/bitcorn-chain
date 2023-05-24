@@ -87,9 +87,9 @@ class TransactionsController < ApplicationController
 
     if transaction.save
       update_balances
-      render json: { status: "success", message: "Transaction created successfully" }, status: :created
+      render json: { status: 'success', message: 'Transaction created successfully' }, status: :created
     else
-      error_response("Unable to create transaction")
+      error_response('Unable to create transaction')
     end
   end
 

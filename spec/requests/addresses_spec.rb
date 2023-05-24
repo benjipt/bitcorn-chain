@@ -36,7 +36,7 @@ RSpec.describe 'Addresses', type: :request do
       end
 
       it 'returns an error message' do
-        expect(response.body).to match("Address not found")
+        expect(response.body).to match('Address not found')
       end
     end
 
