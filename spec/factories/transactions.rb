@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # spec/factories/transactions.rb
 FactoryBot.define do
   factory :transaction do

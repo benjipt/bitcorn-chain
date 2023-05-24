@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # config/routes.rb
 Rails.application.routes.draw do
   resources :addresses, only: [:show, :create], param: :id

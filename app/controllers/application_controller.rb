@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ApplicationController is a controller class that inherits from ActionController::API.
 # It serves as the base controller for all other controllers in the application.
 # ApplicationController applies a `before_action` to transform request parameters for every request.

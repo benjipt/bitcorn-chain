@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This controller manages transactions within the application.
 # Transactions have the fields 'from_address', 'to_address' and 'amount'.
 # Each transaction transfers an amount from a sender to a receiver, denoted by their respective addresses.

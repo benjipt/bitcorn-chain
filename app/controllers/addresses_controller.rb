@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # addresses_controller.rb
 class SeedAddressNotFoundError < StandardError; end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # models/address.rb
 #
 # The Address model represents addresses within the application.
