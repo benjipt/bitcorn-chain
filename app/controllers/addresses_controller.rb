@@ -110,13 +110,11 @@ class AddressesController < ApplicationController
     transaction.from_address.cornlet_balance -= transaction.cornlet_amount
     new_address.cornlet_balance += transaction.cornlet_amount
 
-    if new_address.save && transaction.save && transaction.from_address.save
-      transactions = find_transactions(new_address)
-      response_data = build_response_data(new_address, transactions)
-      render json: response_data, status: :created
-    else
-      raise ActiveRecord::Rollback, "Failed to create transaction"
-    end
+    raise ActiveRecord::Rollback, "Failed to create transaction" unless new_address.save && transaction.save && transaction.from_address.save
+
+    transactions = find_transactions(new_address)
+    response_data = build_response_data(new_address, transactions)
+    render json: response_data, status: :created
   end
 
   def render_existing_address_error(new_address)
