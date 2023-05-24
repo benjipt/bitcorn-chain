@@ -1,31 +1,65 @@
 # frozen_string_literal: true
 
-# models/address.rb
+# Address is a model class that represents an address in the cornlet network.
+# It has many sent transactions and many received transactions, which are
+# defined as the transactions where the address is the from address or the to
+# address, respectively.
 #
-# The Address model represents addresses within the application.
-# Each address can be associated with multiple transactions, both as a sender (from_address) and as a receiver (to_address).
+# The Address class provides the following functionality:
 #
-# == Schema Information
+# - A custom initializer that takes a seed address and an amount of cornlets to
+#   seed the address with.
+# - A method to process a transaction, which updates the cornlet balance of the
+#   address and the from address of the transaction.
+# - A method to return a JSON representation of the address, which includes the
+#   cornlet balance and the transaction history.
 #
-# Table name: addresses
+# The Address model has the following validations:
 #
-# Columns:
-# * id (integer)
-# * address (string)
-# * cornlet_balance (integer)
-# * created_at (datetime)
-# * updated_at (datetime)
+# - The address must be unique.
+# - The address must be present.
+# - The cornlet balance must be a non-negative integer.
 #
-# Each Address has two associations with the Transaction model:
-# * sent_transactions: A one-to-many relationship where the foreign key on the Transaction is from_address and
-# the primary key on the Address is address.
-# * received_transactions: A one-to-many relationship where the foreign key on the Transaction is to_address and
-# the primary key on the Address is address.
+# The Address model has the following associations:
 #
-# The inverse_of option is set on each of these associations, allowing Rails to know that the two associations are inverses of each other.
-# This means that if you have the object on one side of the association, you can get the object on the other side
-# without going through the database.
+# - It has many sent transactions.
+# - It has many received transactions.
 class Address < ApplicationRecord
   has_many :sent_transactions, class_name: 'Transaction', foreign_key: 'from_address', primary_key: 'address', inverse_of: :from_address
   has_many :received_transactions, class_name: 'Transaction', foreign_key: 'to_address', primary_key: 'address', inverse_of: :to_address
+
+  def transactions
+    Transaction.where(from_address: address).or(Transaction.where(to_address: address))
+  end
+
+  def initialize_with_seed_transaction(seed_address, cornlet_amount)
+    self.cornlet_balance += cornlet_amount
+    Transaction.new(
+      from_address: seed_address,
+      to_address: self,
+      cornlet_amount:
+    )
+  end
+
+  def process_transaction(transaction)
+    transaction.from_address.cornlet_balance -= transaction.cornlet_amount
+    self.cornlet_balance += transaction.cornlet_amount
+    return if save && transaction.save && transaction.from_address.save
+
+    raise ActiveRecord::Rollback,
+          'Failed to create transaction'
+  end
+
+  def as_json
+    {
+      balance: cornlet_balance.to_f / 1_000_000.0,
+      transactions: transactions.map do |transaction|
+        {
+          amount: transaction.cornlet_amount.to_f / 1_000_000.0,
+          timestamp: transaction.created_at,
+          toAddress: transaction.to_address.address,
+        }
+      end,
+    }
+  end
 end
