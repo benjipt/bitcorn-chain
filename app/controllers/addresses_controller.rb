@@ -78,7 +78,7 @@ class AddressesController < ApplicationController
           timestamp: transaction.created_at,
           toAddress: transaction.to_address.address,
         }
-      end
+      end,
     }
   end
 

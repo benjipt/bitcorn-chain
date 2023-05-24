@@ -14,8 +14,8 @@ RSpec.describe 'Transactions', type: :request do
           transaction: {
             fromAddress: 'from_address',
             toAddress: 'to_address',
-            amount: '4'
-          }
+            amount: '4',
+          },
         }
       end
 
@@ -47,8 +47,8 @@ RSpec.describe 'Transactions', type: :request do
           transaction: {
             fromAddress: 'from_address',
             toAddress: 'NEW_ADDRESS',
-            amount: '1'
-          }
+            amount: '1',
+          },
         }
 
         expect do
@@ -67,8 +67,8 @@ RSpec.describe 'Transactions', type: :request do
           transaction: {
             fromAddress: 'from_address',
             toAddress: 'to_address',
-            amount: '20'
-          }
+            amount: '20',
+          },
         }
       end
 
@@ -90,8 +90,8 @@ RSpec.describe 'Transactions', type: :request do
         {
           transaction: {
             toAddress: 'to_address',
-            amount: '4'
-          }
+            amount: '4',
+          },
         }
       end
 
@@ -113,8 +113,8 @@ RSpec.describe 'Transactions', type: :request do
         {
           transaction: {
             fromAddress: 'from_address',
-            amount: '4'
-          }
+            amount: '4',
+          },
         }
       end
 
@@ -136,8 +136,8 @@ RSpec.describe 'Transactions', type: :request do
         {
           transaction: {
             fromAddress: 'from_address',
-            toAddress: 'to_address'
-          }
+            toAddress: 'to_address',
+          },
         }
       end
 
@@ -160,8 +160,8 @@ RSpec.describe 'Transactions', type: :request do
           transaction: {
             fromAddress: 'from_address',
             toAddress: 'to_address',
-            amount: '-1'
-          }
+            amount: '-1',
+          },
         }
       end
       let(:zero_amount_params) do
@@ -169,8 +169,8 @@ RSpec.describe 'Transactions', type: :request do
           transaction: {
             fromAddress: 'from_address',
             toAddress: 'to_address',
-            amount: '0'
-          }
+            amount: '0',
+          },
         }
       end
 

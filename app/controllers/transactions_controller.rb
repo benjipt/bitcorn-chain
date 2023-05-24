@@ -52,7 +52,7 @@ class TransactionsController < ApplicationController
     errors = {
       amount_required: 'Amount is required',
       from_address_required: 'fromAddress is required',
-      to_address_required: 'toAddress is required'
+      to_address_required: 'toAddress is required',
     }
     return error_response(errors[:amount_required]) if @amount.nil?
     return error_response(errors[:from_address_required]) if @from_address.nil?
@@ -65,7 +65,7 @@ class TransactionsController < ApplicationController
   def check_amount
     errors = {
       invalid_amount: 'Amount should be greater than 0',
-      invalid_decimal_digits: 'Amount can have no more than 6 digits to the right of the decimal point'
+      invalid_decimal_digits: 'Amount can have no more than 6 digits to the right of the decimal point',
     }
     return error_response(errors[:invalid_amount]) if @amount <= 0
     return error_response(errors[:invalid_decimal_digits]) if decimal_size(@transaction_payload[:amount].to_d) > 6
