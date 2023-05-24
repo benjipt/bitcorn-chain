@@ -32,7 +32,7 @@ Rails/HasManyOrHasOneDependent:
 # SupportedStyles: percent, brackets
 Style/SymbolArray:
   EnforcedStyle: percent
-  MinSize: 10
+  MinSize: 5
 
 # Offense count: 2
 # This cop supports safe autocorrection (--autocorrect).
