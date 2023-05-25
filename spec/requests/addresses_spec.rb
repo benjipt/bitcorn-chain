@@ -86,11 +86,11 @@ RSpec.describe 'Addresses', type: :request do
       end
     end
 
-    let!(:satoshi_address) { create(:address, address: 'satoshi kozuka', cornlet_balance: 1_000_000_000) }
+    let!(:seed_address) { create(:address, address: ENV.fetch('SEED_ADDRESS', nil), cornlet_balance: 1_000_000_000) }
 
     context 'when the seed address is not found' do
       before do
-        Address.find_by(address: 'satoshi kozuka').destroy
+        Address.find_by(address: ENV.fetch('SEED_ADDRESS', nil)).destroy
         post '/addresses', params: { address: 'new_address_without_seed' }
       end
 

@@ -64,6 +64,6 @@ class Address < ApplicationRecord
   end
 
   def restricted?
-    address == 'satoshi kozuka'
+    address == ENV.fetch('SEED_ADDRESS', nil)
   end
 end

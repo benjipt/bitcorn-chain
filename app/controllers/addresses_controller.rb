@@ -51,7 +51,7 @@ class AddressesController < ApplicationController
 
   def initialize_address_with_seed_transaction
     new_address = Address.find_or_initialize_by(address: params[:address].downcase)
-    seed_address = Address.find_by(address: 'satoshi kozuka') || raise(SeedAddressNotFoundError)
+    seed_address = Address.find_by(address: ENV.fetch('SEED_ADDRESS', nil)) || raise(SeedAddressNotFoundError)
     transaction = new_address.initialize_with_seed_transaction(seed_address, 100 * 1_000_000) if new_address.new_record?
     [new_address, transaction]
   end
