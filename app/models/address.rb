@@ -62,4 +62,8 @@ class Address < ApplicationRecord
       end,
     }
   end
+
+  def restricted?
+    address == 'satoshi kozuka'
+  end
 end

@@ -27,6 +27,8 @@ class AddressesController < ApplicationController
 
   def show
     address = Address.find_by!(address: params[:id].downcase)
+    return if check_restricted(address)
+
     render json: address.as_json
   end
 
@@ -52,6 +54,14 @@ class AddressesController < ApplicationController
     seed_address = Address.find_by(address: 'satoshi kozuka') || raise(SeedAddressNotFoundError)
     transaction = new_address.initialize_with_seed_transaction(seed_address, 100 * 1_000_000) if new_address.new_record?
     [new_address, transaction]
+  end
+
+  def check_restricted(address)
+    if address.restricted?
+      render json: { error: 'Restricted user: unable to log in' }, status: :forbidden
+      return true
+    end
+    false
   end
 
   def create_new_address(new_address, transaction)
