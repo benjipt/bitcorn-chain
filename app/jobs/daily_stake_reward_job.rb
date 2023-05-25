@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This is a job class that is responsible for handling daily stake rewards.
-# The stake rewards are transferred from the seed address ('satoshi kozuka') to each
+# The stake rewards are transferred from the seed address to each
 # address that has a cornlet_balance greater than or equal to 10,000,000 Cornlets.
 # This job is processed in the default queue.
 class DailyStakeRewardJob < ApplicationJob
@@ -12,14 +12,14 @@ class DailyStakeRewardJob < ApplicationJob
   # If the balance is sufficient, it proceeds to transfer stake rewards to qualified addresses.
   # Qualified addresses are those having a cornlet_balance >= 10_000_000 and not equal to the seed address.
   def perform
-    seed_address = Address.find_by(address: 'satoshi kozuka')
+    seed_address = Address.find_by(address: ENV.fetch('SEED_ADDRESS', nil))
     unless seed_address && seed_address.cornlet_balance >= 25_000_000
-      Rails.logger.info "Satoshi Kozuka's address does not exist or doesn't have enough balance."
+      Rails.logger.info "Seed address does not exist or doesn't have enough balance."
       return
     end
 
-    # For each address with cornlet_balance >= 10_000_000 except Satoshi, generate a stake reward transaction.
-    Address.where('cornlet_balance >= ? AND address <> ?', 10_000_000, 'satoshi kozuka').find_each do |address|
+    # For each address with cornlet_balance >= 10_000_000 except seed, generate a stake reward transaction.
+    Address.where('cornlet_balance >= ? AND address <> ?', 10_000_000, ENV.fetch('SEED_ADDRESS', nil)).find_each do |address|
       process_address(address, seed_address)
     end
   end
