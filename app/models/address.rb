@@ -33,7 +33,6 @@ class Address < ApplicationRecord
   end
 
   def initialize_with_seed_transaction(seed_address, cornlet_amount)
-    self.cornlet_balance += cornlet_amount
     Transaction.new(
       from_address: seed_address,
       to_address: self,
