@@ -1,0 +1,53 @@
+name: RSpec
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15.2
+        env:
+          RAILS_ENV: test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bc_test
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.1.0
+
+    - name: Setup test database
+      run: |
+        sudo apt-get install -y postgresql-client
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+        psql -h localhost -c 'DROP DATABASE IF EXISTS bc_test;' -U postgres
+        psql -h localhost -c 'CREATE DATABASE bc_test;' -U postgres
+        RAILS_ENV=test bundle exec rake db:schema:load db:seed
+      env:
+        PGPASSWORD: postgres
+        RAILS_ENV: test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/bc_test
+        LOCAL_ORIGIN: ${{ secrets.LOCAL_ORIGIN }}
+        PRODUCTION_ORIGIN: ${{ secrets.PRODUCTION_ORIGIN }}
+
+    - name: Build and test with Rake
+      env:
+        RAILS_ENV: test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/bc_test
+        LOCAL_ORIGIN: ${{ secrets.LOCAL_ORIGIN }}
+        PRODUCTION_ORIGIN: ${{ secrets.PRODUCTION_ORIGIN }}
+      run: bundle exec rspec
