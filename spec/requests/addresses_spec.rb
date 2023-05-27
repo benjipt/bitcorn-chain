@@ -66,6 +66,10 @@ RSpec.describe 'Addresses', type: :request do
         expect(response).to have_http_status(201)
         expect(Address.find_by(address: 'new_address')).not_to be_nil
       end
+
+      it 'has an initial balance of 100_000_000' do
+        expect(Address.find_by(address: 'new_address').cornlet_balance).to eq(100_000_000)
+      end
     end
 
     context 'when the address already exists' do
