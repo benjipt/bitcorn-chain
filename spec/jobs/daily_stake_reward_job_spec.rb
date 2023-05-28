@@ -4,7 +4,12 @@ require 'rails_helper'
 
 RSpec.describe DailyStakeRewardJob, type: :job do
   describe '#perform' do
-    let!(:seed) { create(:address, address: ENV.fetch('SEED_ADDRESS', nil), cornlet_balance: 100_000_000_000) }
+    let!(:seed) do
+      # Depending on the test environment, we may need to create the seed address
+      Address.find_or_create_by(address: ENV.fetch('SEED_ADDRESS', '0x0000000000000000000000000000000000000000')) do |address|
+        address.cornlet_balance ||= 100_000_000_000
+      end
+    end
     let!(:address1) { create(:address, cornlet_balance: 10_000_000) }
     let!(:address2) { create(:address, cornlet_balance: 9_999_999) }
     let!(:address3) { create(:address, cornlet_balance: 15_000_000) }
